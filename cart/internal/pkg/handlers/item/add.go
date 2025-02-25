@@ -43,6 +43,11 @@ func NewItemsAddHandler(itemsAdder Adder) *AddHandler {
 }
 
 func (h AddHandler) Handle(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.Header().Set("Allow", http.MethodPost)
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+	}
+
 	req := &AddRequest{}
 	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 		handlers.GetErrorResponse(w, h.name, err, http.StatusBadRequest)
