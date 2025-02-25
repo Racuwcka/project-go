@@ -54,6 +54,9 @@ func (app *App) Start() error {
 	itemAddHandler := hitem.NewItemsAddHandler(sitem.NewAddService(lomsClient, productClient))
 	http.HandleFunc("/item/add", itemAddHandler.Handle)
 
+	itemDeleteHAndler := hitem.NewItemsDeleteHandler(sitem.NewDeleteService())
+	http.HandleFunc("/item/delete", itemDeleteHAndler.Handle)
+
 	log.Fatal(http.ListenAndServe(app.config.addr, nil))
 	return nil
 }

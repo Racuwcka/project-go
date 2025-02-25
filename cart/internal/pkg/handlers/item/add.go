@@ -3,15 +3,8 @@ package item
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"route256/cart/internal/pkg/handlers"
-)
-
-var (
-	errorIncorrectUser  = errors.New("incorrect user")
-	errorIncorrectSKU   = errors.New("incorrect SKU")
-	errorIncorrectCount = errors.New("incorrect count")
 )
 
 func (r AddRequest) Validate() error {
@@ -28,9 +21,9 @@ func (r AddRequest) Validate() error {
 }
 
 type AddRequest struct {
-	User  int64
-	SKU   uint32
-	Count uint16
+	User  int64  `json:"user,omitempty"`
+	SKU   uint32 `json:"sku,omitempty"`
+	Count uint16 `json:"count,omitempty"`
 }
 
 type Adder interface {
