@@ -27,7 +27,7 @@ type AddRequest struct {
 }
 
 type Adder interface {
-	Add(ctx context.Context, user int64, sku uint32, count uint16) error
+	Add(ctx context.Context, user int64, sku uint32, count uint16, token string) error
 }
 
 type AddHandler struct {
@@ -59,7 +59,13 @@ func (h AddHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.s.Add(r.Context(), req.User, req.SKU, req.Count); err != nil {
+	token := r.Header.Get("Authorization")
+	if token == "" {
+		http.Error(w, "missing token", http.StatusUnauthorized)
+		return
+	}
+
+	if err := h.s.Add(r.Context(), req.User, req.SKU, req.Count, token); err != nil {
 		handlers.GetErrorResponse(w, h.name, err, http.StatusInternalServerError)
 		return
 	}

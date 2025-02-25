@@ -28,9 +28,9 @@ type GetProductErrorResponse struct {
 	Message string `json:"message,omitempty"`
 }
 
-func (c Client) GetProductInfo(sku uint32) (string, uint32, error) {
+func (c Client) GetProductInfo(sku uint32, token string) (string, uint32, error) {
 	request := GetProductRequest{
-		Token: "testtoken", // TODO: получить из header запроса
+		Token: token,
 		SKU:   sku,
 	}
 

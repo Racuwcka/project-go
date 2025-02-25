@@ -12,7 +12,7 @@ type StocksProvider interface {
 }
 
 type ProductProvider interface {
-	GetProductInfo(sku uint32) (string, uint32, error)
+	GetProductInfo(sku uint32, token string) (string, uint32, error)
 }
 type AddService struct {
 	name            string
@@ -30,8 +30,8 @@ func NewAddService(stocksProvider StocksProvider, productProvider ProductProvide
 	}
 }
 
-func (s AddService) Add(ctx context.Context, user int64, sku uint32, count uint16) error {
-	if _, _, err := s.productProvider.GetProductInfo(sku); err != nil {
+func (s AddService) Add(ctx context.Context, user int64, sku uint32, count uint16, token string) error {
+	if _, _, err := s.productProvider.GetProductInfo(sku, token); err != nil {
 		return err
 	}
 
