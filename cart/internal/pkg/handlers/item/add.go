@@ -1,0 +1,70 @@
+package item
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"net/http"
+	"route256/cart/internal/pkg/handlers"
+)
+
+var (
+	errorIncorrectUser  = errors.New("incorrect user")
+	errorIncorrectSKU   = errors.New("incorrect SKU")
+	errorIncorrectCount = errors.New("incorrect count")
+)
+
+func (r AddRequest) Validate() error {
+	if r.User == 0 {
+		return errorIncorrectUser
+	}
+	if r.SKU == 0 {
+		return errorIncorrectSKU
+	}
+	if r.Count == 0 {
+		return errorIncorrectCount
+	}
+	return nil
+}
+
+type AddRequest struct {
+	User  int64
+	SKU   uint32
+	Count uint16
+}
+
+type Adder interface {
+	Add(ctx context.Context, user int64, sku uint32, count uint16) error
+}
+
+type AddHandler struct {
+	name string
+	s    Adder
+}
+
+func NewItemsAddHandler(itemsAdder Adder) *AddHandler {
+	return &AddHandler{
+		name: "item add handler",
+		s:    itemsAdder,
+	}
+}
+
+func (h AddHandler) Handle(w http.ResponseWriter, r *http.Request) {
+	req := &AddRequest{}
+	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+		handlers.GetErrorResponse(w, h.name, err, http.StatusBadRequest)
+		return
+	}
+
+	if err := req.Validate(); err != nil {
+		handlers.GetErrorResponse(w, h.name, err, http.StatusBadRequest)
+		return
+	}
+
+	if err := h.s.Add(r.Context(), req.User, req.SKU, req.Count); err != nil {
+		handlers.GetErrorResponse(w, h.name, err, http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
