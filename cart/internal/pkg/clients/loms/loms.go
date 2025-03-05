@@ -46,8 +46,6 @@ func (c Client) GetStocks(ctx context.Context, sku uint32) (uint64, error) {
 		_ = httpRequest.Body.Close()
 	}()
 
-	fmt.Println(httpResponse.Status)
-
 	if httpResponse.StatusCode != http.StatusOK {
 		return 0, fmt.Errorf("error getting stocks: status %d", httpResponse.StatusCode)
 	}

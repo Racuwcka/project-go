@@ -7,6 +7,7 @@ import (
 	"route256/cart/internal/pkg/clients/loms"
 	"route256/cart/internal/pkg/clients/product"
 	hitem "route256/cart/internal/pkg/handlers/item"
+	"route256/cart/internal/pkg/repository"
 	sitem "route256/cart/internal/pkg/services/item"
 )
 
@@ -54,8 +55,18 @@ func (app *App) Start() error {
 	itemAddHandler := hitem.NewItemsAddHandler(sitem.NewAddService(lomsClient, productClient))
 	http.HandleFunc("/item/add", itemAddHandler.Handle)
 
-	itemDeleteHAndler := hitem.NewItemsDeleteHandler(sitem.NewDeleteService())
-	http.HandleFunc("/item/delete", itemDeleteHAndler.Handle)
+	repo := repository.NewDumbRepo()
+	itemDeleteHandler := hitem.NewItemsDeleteHandler(sitem.NewDeleteService(repo))
+	http.HandleFunc("/item/delete", itemDeleteHandler.Handle)
+
+	itemListHandler := hitem.NewItemsListHandler(sitem.NewListService(productClient, repo))
+	http.HandleFunc("/item/list", itemListHandler.Handle)
+
+	itemClearHandler := hitem.NewItemsClearHandler(sitem.NewClearService(repo))
+	http.HandleFunc("/item/clear", itemClearHandler.Handle)
+
+	itemCheckoutHandler := hitem.NewItemsCheckoutHandler(sitem.NewCheckoutService(repo))
+	http.HandleFunc("/item/checkout", itemCheckoutHandler.Handle)
 
 	log.Fatal(http.ListenAndServe(app.config.addr, nil))
 	return nil

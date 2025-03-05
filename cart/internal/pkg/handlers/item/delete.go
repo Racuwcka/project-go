@@ -27,8 +27,6 @@ func (r DeleteRequest) Validate() error {
 	return nil
 }
 
-type DeleteResponse struct{}
-
 type Deleter interface {
 	Delete(ctx context.Context, user int64, sku uint32) error
 }
@@ -44,6 +42,7 @@ func (h DeleteHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", http.MethodPost)
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
 	}
 
 	req := &DeleteRequest{}
@@ -54,6 +53,7 @@ func (h DeleteHandler) Handle(w http.ResponseWriter, r *http.Request) {
 
 	if err := req.Validate(); err != nil {
 		handlers.GetErrorResponse(w, h.name, err, http.StatusBadRequest)
+		return
 	}
 
 	if err := h.d.Delete(r.Context(), req.User, req.Sku); err != nil {

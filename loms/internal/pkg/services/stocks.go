@@ -1,19 +1,20 @@
 package services
 
-type StocksProvider interface {
-	GetStocks(sku uint32) uint64
+type InfoRepository interface {
+	GetBySKU(sku uint32) uint64
 }
 
 type StocksService struct {
-	stocksProvider StocksProvider
+	repo InfoRepository
 }
 
-func NewStocksService(stocksProvider StocksProvider) *StocksService {
+func NewStocksService(repo InfoRepository) *StocksService {
 	return &StocksService{
-		stocksProvider: stocksProvider,
+		repo: repo,
 	}
 }
 
 func (s *StocksService) GetStocks(sku uint32) uint64 {
-	return s.stocksProvider.GetStocks(sku)
+	count := s.repo.GetBySKU(sku)
+	return count
 }

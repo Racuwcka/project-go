@@ -8,6 +8,10 @@ import (
 	"net/url"
 )
 
+type ProductProvider interface {
+	GetProductInfo(sku uint32, token string) (string, uint32, error)
+}
+
 type Client struct {
 	name string
 	path string
